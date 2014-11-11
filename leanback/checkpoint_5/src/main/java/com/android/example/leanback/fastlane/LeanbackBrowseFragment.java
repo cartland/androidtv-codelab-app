@@ -19,10 +19,7 @@ package com.android.example.leanback.fastlane;
 
 import android.app.Fragment;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.CursorObjectAdapter;
@@ -31,20 +28,16 @@ import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.ObjectAdapter;
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
-import android.support.v17.leanback.widget.OnItemViewSelectedListener;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.SinglePresenterSelector;
-import android.util.DisplayMetrics;
 import android.view.View;
 
 import com.android.example.leanback.R;
 import com.android.example.leanback.data.Video;
 import com.android.example.leanback.data.VideoDataManager;
 import com.android.example.leanback.data.VideoItemContract;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.io.Serializable;
 
@@ -55,7 +48,6 @@ import java.io.Serializable;
 public class LeanbackBrowseFragment extends BrowseFragment {
 
     private ArrayObjectAdapter mRowsAdapter;
-    private BackgroundHelper bgHelper;
 
     private static final String[] HEADERS = new String[]{
         "Featured", "Popular","Editor's choice"
@@ -87,10 +79,6 @@ public class LeanbackBrowseFragment extends BrowseFragment {
 
 
         setOnItemViewClickedListener(getDefaultItemViewClickedListener());
-        setOnItemViewSelectedListener(getDefaultItemSelectedListener());
-
-        bgHelper = new BackgroundHelper(getActivity());
-        bgHelper.prepareBackgroundManager();
 
     }
 
@@ -107,19 +95,4 @@ public class LeanbackBrowseFragment extends BrowseFragment {
             }
         };
     }
-
-    protected OnItemViewSelectedListener getDefaultItemSelectedListener() {
-
-        return new OnItemViewSelectedListener() {
-            public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
-                                       RowPresenter.ViewHolder rowViewHolder, Row row) {
-                if (item instanceof Video) {
-                    bgHelper.setBackgroundUrl(((Video) item).getThumbUrl());
-                    bgHelper.startBackgroundTimer();
-                }
-
-            }
-        };
-    }
-
 }

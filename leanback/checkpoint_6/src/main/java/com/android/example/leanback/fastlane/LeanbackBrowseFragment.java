@@ -50,7 +50,7 @@ import java.io.Serializable;
 
 
 /**
- * A simple {@link android.app.Fragment} subclass.
+ * A simple {@link Fragment} subclass.
  */
 public class LeanbackBrowseFragment extends BrowseFragment {
 

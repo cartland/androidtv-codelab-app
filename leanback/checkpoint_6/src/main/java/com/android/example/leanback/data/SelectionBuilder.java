@@ -36,7 +36,7 @@ import android.database.sqlite.SQLiteDatabase;
         import java.util.HashMap;
 
 /**
- * Helper for building selection clauses for {@link android.database.sqlite.SQLiteDatabase}. Each
+ * Helper for building selection clauses for {@link SQLiteDatabase}. Each
  * appended clause is combined using {@code AND}. This class is <em>not</em>
  * thread safe.
  */

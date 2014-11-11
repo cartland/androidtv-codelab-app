@@ -30,7 +30,6 @@ import android.widget.MediaController;
 import android.widget.Toast;
 
 import com.android.example.leanback.data.Video;
-import com.android.example.leanback.fastlane.PlaybackOverlayFragment;
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.FrameworkSampleSource;
@@ -46,13 +45,13 @@ import com.google.android.exoplayer.util.PlayerControl;
  * An activity that plays media using {@link com.google.android.exoplayer.ExoPlayer}.
  */
 public class PlayerActivity extends Activity implements SurfaceHolder.Callback,
-        ExoPlayer.Listener, MediaCodecVideoTrackRenderer.EventListener,
-        PlaybackOverlayFragment.OnPlayPauseClickedListener {
+        ExoPlayer.Listener, MediaCodecVideoTrackRenderer.EventListener {
 
 
     public static final int RENDERER_COUNT = 2;
 
-    private static final String TAG = PlayerActivity.class.getSimpleName();
+    private static final String TAG = "PlayerActivity";
+    String url = "http://commondatastorage.googleapis.com/android-tv/Sample%20videos/April%20Fool's%202013/Introducing%20Google%20Fiber%20to%20the%20Pole.mp4";
 
     private Video mVideo;
 
@@ -65,35 +64,21 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback,
 
     private boolean autoPlay = true;
 
-    private PlaybackOverlayFragment mPlaybackOverlayFragment;
-    private boolean mIsOnTv;
-    private PlayerControl playerControl;
-    private int mPlayerPosition;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate()");
         setContentView(R.layout.activity_player);
 
         mVideo = (Video)getIntent().getSerializableExtra(Video.INTENT_EXTRA_VIDEO);
 
-        // We will use the PlaybackOverlayFragment when running on TV.
-        mIsOnTv = MyUtil.isRunningInTvMode(this);
-        if (mIsOnTv) {
-            // On TV we will use the resource in layout-televsion
-            mPlaybackOverlayFragment = (PlaybackOverlayFragment)
-                    getFragmentManager().findFragmentById(R.id.playback_controls_fragment);
-        } else {
-            shutterView = findViewById(R.id.shutter);
-            View root = findViewById(R.id.root);
-            mediaController = new MediaController(this);
+        View root = findViewById(R.id.root);
+        mediaController = new MediaController(this);
 
-            //overscan safe on 1980 * 1080 TV
-            mediaController.setPadding(48, 27, 48, 27);
-            mediaController.setAnchorView(root);
-        }
+        //overscan safe on 1980 * 1080 TV
+        mediaController.setPadding(48, 27, 48, 27);
+        mediaController.setAnchorView(root);
+        shutterView = findViewById(R.id.shutter);
         surfaceView = (VideoSurfaceView) findViewById(R.id.surface_view);
         surfaceView.getHolder().addCallback(this);
 
@@ -101,7 +86,10 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback,
     }
 
     private void preparePlayer() {
-        Log.d(TAG, "preparePlayer()");
+        // TODO(cartland): Remove sample video.
+        String url = "http://commondatastorage.googleapis.com/android-tv/Sample%20videos/April%20Fool's%202013/Introducing%20Google%20Fiber%20to%20the%20Pole.mp4";
+        mVideo.setContentUrl(url);
+
         SampleSource sampleSource =
                 new FrameworkSampleSource(this, Uri.parse(mVideo.getContentUrl()), /* headers */ null, RENDERER_COUNT);
 
@@ -109,39 +97,16 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback,
         videoRenderer = new MediaCodecVideoTrackRenderer(sampleSource, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT);
         TrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource);
 
+
         // Setup the player
         player = ExoPlayer.Factory.newInstance(RENDERER_COUNT, 1000, 5000);
         player.addListener(this);
+        // Build the player controls
+        mediaController.setMediaPlayer(new PlayerControl(player));
+        mediaController.setEnabled(true);
         player.prepare(videoRenderer, audioRenderer);
-        if (mIsOnTv) {
-            // This PlayerControl must stay in sync with PlaybackOverlayFragment.
-            // We created methods such as PlaybackOverlayFragment.pressPlay() to request
-            // that the fragment change the playback state. When the fragment receives a playback
-            // request, it updates the UI and then calls a method in this activity according to
-            // PlaybackOverlayFragment.OnPlayPauseClickedListener.
-            playerControl = new PlayerControl(player);
-        } else {
-            // Build the player controls
-            mediaController.setMediaPlayer(new PlayerControl(player));
-            mediaController.setEnabled(true);
-        }
-        maybeStartPlayback();
     }
 
-    private void releasePlayer() {
-        Log.d(TAG, "releasePlayer()");
-        if (player != null) {
-            player.release();
-            player = null;
-        }
-        videoRenderer = null;
-    }
-
-    private void reloadVideo() {
-        Log.d(TAG, "reloadVideo()");
-        releasePlayer();
-        preparePlayer();
-    }
 
     @Override
     public void onResume() {
@@ -150,35 +115,32 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback,
 
     @Override
     public void onPause() {
-        if (mIsOnTv) {
-            if (playerControl != null && playerControl.isPlaying()) {
-                // Allows video to play behind the launcher screen when the user preses
-                // the Home button.
-                // This is only available on API level 21+, and we are assuming
-                // all TV devices on running Android 21+.
-                requestVisibleBehind(true);
-            }
-        }
+        requestVisibleBehind(true);
         super.onPause();
     }
 
     @Override
     public void onVisibleBehindCanceled() {
         super.onVisibleBehindCanceled();
-        releasePlayer();
-        if (!mIsOnTv) {
-            shutterView.setVisibility(View.VISIBLE);
+        if (player != null) {
+            player.release();
+            player = null;
         }
+        videoRenderer = null;
+        shutterView.setVisibility(View.VISIBLE);
     }
 
 
     @Override
     protected void onStop() {
         super.onStop();
-        releasePlayer();
-        if (!mIsOnTv) {
-            shutterView.setVisibility(View.VISIBLE);
+        if (player != null) {
+            player.release();
+            player = null;
         }
+        videoRenderer = null;
+        shutterView.setVisibility(View.VISIBLE);
+
     }
 
     private void maybeStartPlayback() {
@@ -190,13 +152,7 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback,
         }
         player.sendMessage(videoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, surface);
         if (autoPlay) {
-            if (mIsOnTv) {
-                // This will update the player controls and the activity will receive the callback
-                // OnPlayPauseClickedListener.onFragmentPlayPause(Video, int, Boolean)
-                mPlaybackOverlayFragment.pressPlay();
-            } else {
-                player.setPlayWhenReady(true);
-            }
+            player.setPlayWhenReady(true);
             autoPlay = false;
         }
     }
@@ -212,11 +168,12 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback,
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        Log.d(TAG, "onPlayerStateChanged(playbackState=" + playbackState + ")");
-        if (!mIsOnTv && playbackState == ExoPlayer.STATE_READY) {
+        Log.d(TAG, "player state " + playbackState);
+        if (playbackState == ExoPlayer.STATE_READY) {
             shutterView.setVisibility(View.GONE);
             mediaController.show(0);
         }
+
     }
 
     @Override
@@ -236,10 +193,9 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback,
 
     @Override
     public void onDrawnToSurface(Surface surface) {
-        if (!mIsOnTv) {
-            shutterView.setVisibility(View.GONE);
-            mediaController.show(0);
-        }
+        shutterView.setVisibility(View.GONE);
+        mediaController.show(0);
+
     }
 
     @Override
@@ -276,52 +232,4 @@ public class PlayerActivity extends Activity implements SurfaceHolder.Callback,
             player.blockingSendMessage(videoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, null);
         }
     }
-
-    /**
-     * Implementation of PlaybackOverlayFragment.OnPlayPauseClickedListener
-     */
-    public void onFragmentPlayPause(Video video, int position, Boolean playPause) {
-        Log.d(TAG, "onFragmentPlayPause()");
-        if (mVideo == null || !mVideo.getTitle().equals(video.getTitle())) {
-            // When the user selects another video from the PlaybackOverlayFragment, we need
-            // to recognize that the video has changed and reload the player.
-            mVideo = video;
-            reloadVideo();
-        }
-        if (mVideo == null) {
-            return;
-        }
-
-        mPlayerPosition = position;
-        // seekTo(), start(), pause() are ONLY be called in response to the fragment callbacks
-        playerControl.seekTo(mPlayerPosition);
-        if (playPause) {
-            Log.d(TAG, "Play");
-            playerControl.start();
-        } else {
-            Log.d(TAG, "Pause");
-            playerControl.pause();
-        }
-    }
-
-    /**
-     * Implementation of PlaybackOverlayFragment.OnPlayPauseClickedListener
-     */
-    public void onFragmentFfwRwd(Video video, int position) {
-        Log.d(TAG, "onFragmentFfwRwd() seek to " + position);
-        if (mVideo == null || !mVideo.getTitle().equals(video.getTitle())) {
-            // When the user selects another video from the PlaybackOverlayFragment, we need
-            // to recognize that the video has changed and reload the player.
-            mVideo = video;
-            reloadVideo();
-        }
-        if (mVideo == null) {
-            return;
-        }
-
-        mPlayerPosition = position;
-        // seekTo() is ONLY be called in response to the fragment callbacks
-        playerControl.seekTo(mPlayerPosition);
-    }
-
 }

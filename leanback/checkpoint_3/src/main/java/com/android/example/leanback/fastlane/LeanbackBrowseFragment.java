@@ -18,7 +18,8 @@ package com.android.example.leanback.fastlane;
 
 
 import android.app.Fragment;
-import android.content.Intent;
+import android.app.LoaderManager;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v17.leanback.app.BrowseFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
@@ -27,19 +28,12 @@ import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.ObjectAdapter;
-import android.support.v17.leanback.widget.OnItemViewClickedListener;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.Row;
-import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.SinglePresenterSelector;
 import android.view.View;
 
 import com.android.example.leanback.R;
-import com.android.example.leanback.data.Video;
 import com.android.example.leanback.data.VideoDataManager;
 import com.android.example.leanback.data.VideoItemContract;
-
-import java.io.Serializable;
 
 
 /**
@@ -77,22 +71,5 @@ public class LeanbackBrowseFragment extends BrowseFragment {
             mRowsAdapter.add(new ListRow(headerItem, manager.getItemList()));
         }
 
-
-        setOnItemViewClickedListener(getDefaultItemViewClickedListener());
-
-    }
-
-    protected OnItemViewClickedListener getDefaultItemViewClickedListener() {
-        return new OnItemViewClickedListener() {
-
-            @Override
-            public void onItemClicked(Presenter.ViewHolder viewHolder, Object o, RowPresenter.ViewHolder viewHolder2, Row row) {
-
-                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
-                intent.putExtra(Video.INTENT_EXTRA_VIDEO, (Serializable)o);
-                startActivity(intent);
-
-            }
-        };
     }
 }

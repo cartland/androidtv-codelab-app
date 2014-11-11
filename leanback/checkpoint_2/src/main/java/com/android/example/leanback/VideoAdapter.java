@@ -57,7 +57,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
 
     // Create new views (invoked by the layout manager)
     @Override
-    public VideoAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+    public ViewHolder onCreateViewHolder(ViewGroup parent,
                                                       int viewType) {
         // create a new view
         CardView v = (CardView) LayoutInflater.from(parent.getContext())

@@ -56,7 +56,6 @@ public class VideoDetailsFragment extends DetailsFragment {
 
     private static final int ACTION_PLAY = 1;
     private static final int ACTION_WATCH_LATER = 2;
-    BackgroundHelper bgHelper;
 
 
     @Override
@@ -64,13 +63,7 @@ public class VideoDetailsFragment extends DetailsFragment {
         super.onCreate(savedInstanceState);
         selectedVideo = (Video) getActivity().getIntent().getSerializableExtra(Video.INTENT_EXTRA_VIDEO);
         new DetailRowBuilderTask().execute(selectedVideo);
-
-        bgHelper = new BackgroundHelper(getActivity());
-        bgHelper.prepareBackgroundManager();
-        bgHelper.updateBackground(selectedVideo.getThumbUrl());
-
     }
-
 
     private class DetailRowBuilderTask extends AsyncTask<Video, Integer, DetailsOverviewRow> {
 
@@ -92,7 +85,6 @@ public class VideoDetailsFragment extends DetailsFragment {
             row.addAction(new Action(ACTION_PLAY, getResources().getString(
                     R.string.action_play)));
             row.addAction(new Action(ACTION_WATCH_LATER, getResources().getString(R.string.action_watch_later)));
-
             return row;
 
         }
@@ -139,9 +131,6 @@ public class VideoDetailsFragment extends DetailsFragment {
             adapter.add(new ListRow(header, rowAdapter));
             setAdapter(adapter);
             // <END>
-
-
-
         }
 
     }

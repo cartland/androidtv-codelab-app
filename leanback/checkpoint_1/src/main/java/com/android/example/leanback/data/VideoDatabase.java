@@ -59,8 +59,6 @@ public class VideoDatabase extends SQLiteOpenHelper {
         db.execSQL(sql);
         inserData(db);
 
-
-
     }
 
     @Override

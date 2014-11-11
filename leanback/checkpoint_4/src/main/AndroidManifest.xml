@@ -23,20 +23,18 @@
         tools:overrideLibrary="android.support.v17.leanback, android.support.v7.recyclerview, android.support.v4"/>
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <uses-feature
-        android:name="android.software.leanback"
+    <uses-feature android:name="android.software.leanback"
         android:required="false" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:banner="@drawable/filmi_banner"
         android:label="@string/app_name"
+        android:banner="@drawable/filmi_banner"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.android.example.leanback.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,17 +44,17 @@
         </activity>
 
         <provider
-            android:name="com.android.example.leanback.data.VideoContentProvider"
+            android:name=".data.VideoContentProvider"
             android:authorities="com.android.example.leanback"
             android:enabled="true"
             android:exported="true" >
         </provider>
 
         <activity
-            android:name="com.android.example.leanback.PlayerActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_player"
+            android:name=".PlayerActivity"
             android:screenOrientation="landscape"
+            android:label="@string/title_activity_player"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" >
         </activity>
 
@@ -65,33 +63,25 @@
             android:label="@string/app_name" >
         </activity>
 
+
         <activity
-            android:name="com.android.example.leanback.fastlane.LeanbackActivity"
+            android:name=".fastlane.LeanbackActivity"
             android:label="@string/title_activity_player"
             android:theme="@style/AppTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
+
         </activity>
+
         <activity
             android:name="com.android.example.leanback.fastlane.VideoDetailsActivity"
-            android:exported="true"
             android:label="@string/title_activity_player"
-            android:theme="@style/AppTheme" >
+            android:theme="@style/AppTheme"
+            android:exported="true">
+
         </activity>
-
-        <receiver
-            android:name="com.android.example.leanback.fastlane.BootCompleteReceiver"
-            android:enabled="true"
-            android:exported="true" >
-        </receiver>
-
-        <service
-            android:name="com.android.example.leanback.fastlane.RecommendationsService"
-            android:enabled="true"
-            android:exported="true"/>
     </application>
 
 </manifest>

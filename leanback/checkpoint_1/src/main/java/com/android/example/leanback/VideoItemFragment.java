@@ -17,7 +17,10 @@
 package com.android.example.leanback;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentTransaction;
+import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -26,10 +29,13 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.os.Bundle;
+import android.app.Fragment;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;

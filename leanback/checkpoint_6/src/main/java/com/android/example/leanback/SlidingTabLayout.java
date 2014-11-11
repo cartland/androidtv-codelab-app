@@ -129,7 +129,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
     }
 
     /**
-     * Set the {@link android.support.v4.view.ViewPager.OnPageChangeListener}. When using {@link com.android.example.leanback.SlidingTabLayout} you are
+     * Set the {@link android.support.v4.view.ViewPager.OnPageChangeListener}. When using {@link SlidingTabLayout} you are
      * required to set any {@link android.support.v4.view.ViewPager.OnPageChangeListener} through this method. This is so
      * that the layout can update it's scroll position correctly.
      *
